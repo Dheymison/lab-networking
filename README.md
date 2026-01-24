@@ -129,6 +129,61 @@ docker run --rm -it --network lab-net alpine:3.20 sh -c "apk add --no-cache curl
 
 ---
 
+---
+
+## Evidências (para entrega)
+
+Tire prints (ou cole o output) de:
+
+1. **Container publicado no host (port mapping)**
+   ```bash
+   docker ps | grep lab-net-web
+   curl -I http://localhost:8080 | head
+   ```
+
+2. **Rede custom criada**
+   ```bash
+   docker network ls | grep lab-net
+   ```
+
+3. **Container conectado na rede (bridge custom)**
+   - Print do trecho que mostra o container em `docker network inspect`:
+   ```bash
+   docker network inspect lab-net | grep -n lab-net-web || true
+   ```
+
+4. **DNS interno funcionando (container → container)**
+   - Print do `curl` rodando **dentro** do Alpine (Checkpoint C):
+   ```bash
+   docker run --rm -it --network lab-net alpine:3.20 sh
+   # dentro do container:
+   apk add --no-cache curl
+   curl -I http://lab-net-web | head
+   exit
+   ```
+
+5. **Extra: “sem publicar porta” (interno funciona, host não)**
+   - Print do teste **falhando** no host:
+   ```bash
+   curl -I http://localhost:8080 || echo "OK: sem port mapping não acessa pelo host"
+   ```
+   - Print do teste **funcionando** dentro da rede:
+   ```bash
+   docker run --rm -it --network lab-net alpine:3.20 sh -c "apk add --no-cache curl >/dev/null && curl -I http://lab-net-web | head"
+   ```
+
+Sugestão de pasta para organizar:
+
+- `evidencias/` com:
+  - `01-ps.png`
+  - `02-curl-host.png`
+  - `03-network-ls.png`
+  - `04-network-inspect.png`
+  - `05-curl-interno.png`
+  - (opcional) `06-host-fail.png`
+  - (opcional) `07-interno-ok.png`
+
+
 ## 7) Limpeza
 
 ```bash
